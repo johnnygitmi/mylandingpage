@@ -1,2 +1,2 @@
 # fightForFocus
-Landing Page For Feature Clients 
+game that tracks amount of time focused and away from selected sites
