@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Mode Terminal - Synthwave Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background-attachment: fixed;
+            color: #00d9ff;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        header {
+            background: linear-gradient(90deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 100%);
+            color: #ff00ff;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #00d9ff;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        header h1 {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            margin: 0;
+        }
+
+        header p {
+            color: #00d9ff;
+            text-shadow: 0 0 8px #00d9ff;
+            margin: 5px 0 0 0;
+        }
+
+        nav {
+            background: rgba(15, 12, 41, 0.9);
+            overflow: hidden;
+            border-bottom: 2px solid #9d4edd;
+            backdrop-filter: blur(10px);
+        }
+
+        nav a {
+            float: left;
+            display: block;
+            color: #00d9ff;
+            text-align: center;
+            padding: 10px 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav a:hover {
+            background: linear-gradient(180deg, rgba(255, 0, 255, 0.2) 0%, rgba(157, 78, 221, 0.3) 100%);
+            color: #ff00ff;
+            border-bottom: 3px solid #ff00ff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+
+        main {
+            padding: 10px 10px 60px 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        footer {
+            background: linear-gradient(90deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 100%);
+            color: #00d9ff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            border-top: 2px solid #9d4edd;
+            box-shadow: 0 -4px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        #login-section {
+            display: block;
+            margin: 20px auto;
+            max-width: 450px;
+            background: rgba(15, 12, 41, 0.6);
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #9d4edd;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: rgba(15, 12, 41, 0.8);
+            color: #9d4edd;
+            border: 2px solid #9d4edd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3) 0%, rgba(157, 78, 221, 0.3) 100%);
+            color: #00d9ff;
+            border-color: #00d9ff;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .auth-tab:hover:not(.active) {
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        .auth-form-container {
+            display: none;
+        }
+
+        .auth-form-container.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .auth-message {
+            font-size: 10px;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .auth-message.error {
+            background: rgba(255, 0, 255, 0.2);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+        }
+
+        .auth-message.success {
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+        }
+
+        .auth-note {
+            font-size: 9px;
+            color: #9d4edd;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #focus-section {
+            display: none;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input,
+        button {
+            margin: 5px 0;
+            padding: 8px;
+            background: rgba(15, 12, 41, 0.8);
+            color: #00d9ff;
+            border: 1px solid #00d9ff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        button {
+            cursor: pointer;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.2) 0%, rgba(157, 78, 221, 0.2) 100%);
+            border: 2px solid #00d9ff;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #00d9ff 0%, #ff00ff 100%);
+            color: #0f0c29;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 30px rgba(255, 0, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: linear-gradient(135deg, rgba(15, 12, 41, 0.8) 0%, rgba(48, 43, 99, 0.6) 100%);
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #9d4edd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(157, 78, 221, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            border-color: #00d9ff;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .remove-btn {
+            background: rgba(255, 0, 255, 0.2);
+            color: #ff00ff;
+            border: 1px solid #ff00ff;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .remove-btn:hover {
+            background: #ff00ff;
+            color: #0f0c29;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: auto;
+        }
+
+        .toggle-label input {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .status-span {
+            margin-left: 10px;
+            flex: 1;
+            text-align: right;
+            color: #9d4edd;
+        }
+
+        h1,
+        h2,
+        p {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+        }
+
+        h2 {
+            color: #00d9ff;
+        }
+
+        .league {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 2px solid #9d4edd;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, rgba(0, 217, 255, 0.1) 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .league:hover {
+            border-color: #00d9ff;
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .league h3 {
+            margin: 0 0 10px;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .league .description {
+            margin-bottom: 10px;
+        }
+
+        .league .quote {
+            font-style: italic;
+            border-left: 3px solid #00d9ff;
+            padding-left: 10px;
+            color: #9d4edd;
+            background: rgba(0, 217, 255, 0.05);
+            padding: 8px 8px 8px 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: rgba(15, 12, 41, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #9d4edd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.4) 0%, rgba(0, 217, 255, 0.3) 100%);
+            color: #ff00ff;
+            text-shadow: 0 0 8px #ff00ff;
+        }
+
+        td {
+            color: #00d9ff;
+        }
+
+        tr:hover {
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        section:target,
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Focus Mode Terminal</h1>
+        <p>Log in to block sites and focus!</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#leaderboard">Leaderboard</a>
+    </nav>
+    <main>
+        <section id="login-section">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+
+            <div id="login-tab" class="auth-form-container active">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <input type="text" id="login-username" placeholder="Username" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button type="submit">Log In</button>
+                </form>
+                <p id="login-message" class="auth-message"></p>
+            </div>
+
+            <div id="register-tab" class="auth-form-container">
+                <h2>Create Account</h2>
+                <form id="register-form">
+                    <input type="text" id="register-username" placeholder="Choose Username" required minlength="3">
+                    <input type="password" id="register-password" placeholder="Choose Password" required minlength="4">
+                    <input type="password" id="register-confirm" placeholder="Confirm Password" required>
+                    <button type="submit">Create Account</button>
+                </form>
+                <p id="register-message" class="auth-message"></p>
+                <p class="auth-note">Note: Data is stored locally in your browser only.</p>
+            </div>
+        </section>
+        <section id="focus-section">
+            <h2>Managed Sites</h2>
+            <p>Add sites to manage blocking. No strict limit, but browser localStorage caps at ~5MB (thousands of
+                sites). For real blocking, use extensions.</p>
+            <form id="block-form">
+                <input type="text" id="site" placeholder="Enter site (e.g., example.com)" required>
+                <button type="submit">Add Site</button>
+            </form>
+            <ul id="blocked-list"></ul>
+            <button id="start-focus">Start Focus Session</button>
+            <button id="logout-btn">Log Out</button>
+        </section>
+        <section id="home">
+            <h2>Home</h2>
+            <p>Manage distracting sites for better focus. Focus time is only counted when the page is visible and user
+                is active (mouse/keyboard input within last 5 minutes) to prevent counting sleep or idle time.</p>
+        </section>
+        <section id="about">
+            <h2>About</h2>
+            <p>Simple retro tool to list blocked sites. Leveling up is designed to be challenging, with exponential time
+                requirements to advance leagues.</p>
+        </section>
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>X: @johnnygotmi</p>
+        </section>
+        <section id="leaderboard">
+            <h2>Personal Leaderboard</h2>
+            <p>Your overall league: <span id="overall-league-lb"></span> (Points: <span id="overall-points-lb"></span>)
+            </p>
+            <h3>Site Rankings (Sorted by Points)</h3>
+            <ul id="site-leaderboard"></ul>
+            <h2>League Requirements</h2>
+            <p>Advancing leagues is difficult, requiring exponentially more focus time. Each point is earned per minute
+                of active focus (page visible, no idle >5 min, PC not sleeping). Below are the minimum points
+                (cumulative active minutes) to enter each league:</p>
+            <table>
+                <tr>
+                    <th>League</th>
+                    <th>Min Points to Enter</th>
+                    <th>Approx Time</th>
+                </tr>
+                <tr>
+                    <td>1. Byte Beginner League</td>
+                    <td>0</td>
+                    <td>0 hours</td>
+                </tr>
+                <tr>
+                    <td>2. Pixel Pioneer League</td>
+                    <td>60</td>
+                    <td>1 hour</td>
+                </tr>
+                <tr>
+                    <td>3. Code Crusader League</td>
+                    <td>180</td>
+                    <td>3 hours</td>
+                </tr>
+                <tr>
+                    <td>4. Data Defender League</td>
+                    <td>420</td>
+                    <td>7 hours</td>
+                </tr>
+                <tr>
+                    <td>5. Algorithm Adept League</td>
+                    <td>900</td>
+                    <td>15 hours</td>
+                </tr>
+                <tr>
+                    <td>6. Terminal Titan League</td>
+                    <td>1860</td>
+                    <td>31 hours</td>
+                </tr>
+                <tr>
+                    <td>7. Retro Ruler League</td>
+                    <td>3780</td>
+                    <td>63 hours</td>
+                </tr>
+                <tr>
+                    <td>8. 8-Bit Emperor League</td>
+                    <td>7620</td>
+                    <td>127 hours</td>
+                </tr>
+                <tr>
+                    <td>9. Legend Loader League</td>
+                    <td>15300</td>
+                    <td>255 hours</td>
+                </tr>
+                <tr>
+                    <td>10. Godmode Guardian League</td>
+                    <td>30660</td>
+                    <td>511 hours</td>
+                </tr>
+            </table>
+            <h2>League Descriptions</h2>
+            <p>Climb the ranks in our focus leagues! Each league represents a level of mastery in blocking distractions
+                and staying productive.</p>
+            <div class="league">
+                <h3>1. Byte Beginner League</h3>
+                <div class="description">
+                    <p>This is the starting point for all new users entering the world of focused productivity. Here,
+                        beginners learn to identify common distractions and add their first few sites to block. The
+                        league focuses on building basic habits like daily check-ins and simple goal setting.</p>
+                    <p>As members progress, they unlock tips on time management from retro computing eras. It's designed
+                        to be welcoming and low-pressure, encouraging consistent use of the tool.</p>
+                    <p>Many graduate quickly by maintaining a streak of focused sessions.</p>
+                </div>
+                <div class="quote">"Start with one byte, and soon you'll code your destiny." - Ancient Terminal Sage
+                </div>
+            </div>
+            <div class="league">
+                <h3>2. Pixel Pioneer League</h3>
+                <div class="description">
+                    <p>Building on beginner skills, pioneers explore deeper into distraction management. They experiment
+                        with toggling blocks and analyzing their focus patterns. This league introduces community
+                        challenges inspired by old-school games.</p>
+                    <p>Members share pixel art representations of their productivity journeys. Advancement comes from
+                        blocking more complex sites like forums or news aggregators.</p>
+                    <p>It's where users start to see real improvements in their daily output. The emphasis is on
+                        exploration and fun in focus.</p>
+                    <p>Pioneers often form virtual alliances for mutual encouragement.</p>
+                </div>
+                <div class="quote">"Every pixel blocked is a step into uncharted focus territory." - Retro Explorer
+                </div>
+            </div>
+            <div class="league">
+                <h3>3. Code Crusader League</h3>
+                <div class="description">
+                    <p>Crusaders take on tougher challenges, blocking entire categories of sites. They learn advanced
+                        techniques like timed blocks and exception rules. This league draws from knightly codes of old
+                        games, emphasizing discipline.</p>
+                    <p>Members compete in weekly focus quests to earn badges. Progression requires demonstrating
+                        consistent high-focus periods.</p>
+                    <p>It's a turning point where focus becomes a core part of lifestyle. Crusaders often mentor
+                        beginners in lower leagues.</p>
+                </div>
+                <div class="quote">"Wield your code like a sword against distraction dragons." - Digital Knight</div>
+            </div>
+            <div class="league">
+                <h3>4. Data Defender League</h3>
+                <div class="description">
+                    <p>Defenders protect their time by fortifying blocks against sneaky distractions. They analyze local
+                        storage data to optimize their lists. This league focuses on defensive strategies from strategy
+                        games.</p>
+                    <p>Members build 'walls' of blocked sites and test them in simulations. Advancement involves sharing
+                        defense tactics with the community.</p>
+                    <p>It's about resilience and long-term planning for productivity. Defenders achieve balance between
+                        work and necessary breaks.</p>
+                    <p>Many here start tracking metrics like sites toggled per week.</p>
+                    <p>The league rewards those who maintain impenetrable focus fortresses.</p>
+                </div>
+                <div class="quote">"Defend your data, secure your focus." - Cyber Sentinel</div>
+            </div>
+            <div class="league">
+                <h3>5. Algorithm Adept League</h3>
+                <div class="description">
+                    <p>Adepts master algorithmic thinking to prioritize blocks dynamically. They use patterns from past
+                        sessions to predict distractions. This league incorporates puzzle-solving elements from classic
+                        adventures.</p>
+                    <p>Members solve focus riddles to level up. It's where science meets focus, with data-driven
+                        decisions.</p>
+                    <p>Adepts often experiment with custom scripts in their minds. The goal is efficient, smart
+                        blocking.</p>
+                </div>
+                <div class="quote">"Let algorithms guide your path to peak productivity." - Logic Master</div>
+            </div>
+            <div class="league">
+                <h3>6. Terminal Titan League</h3>
+                <div class="description">
+                    <p>Titans command the terminal with expert precision in blocking. They handle massive lists without
+                        breaking a sweat. This league honors the giants of retro computing.</p>
+                    <p>Members lead epic focus marathons and set records. Advancement requires mentoring lower leagues
+                        and innovating new techniques.</p>
+                    <p>It's the realm of power users who live by the command line ethos. Titans achieve zen-like focus
+                        states.</p>
+                    <p>They often contribute ideas for tool improvements.</p>
+                </div>
+                <div class="quote">"Rise like a titan, command your focus empire." - Console Colossus</div>
+            </div>
+            <div class="league">
+                <h3>7. Retro Ruler League</h3>
+                <div class="description">
+                    <p>Rulers govern their digital kingdoms with absolute focus authority. They block not just sites,
+                        but entire mindsets of distraction. This league draws from kingly strategies in vintage games.
+                    </p>
+                    <p>Members decree focus laws for their routines. Progression involves conquering personal
+                        productivity plateaus.</p>
+                    <p>It's about leadership in one's own life. Rulers inspire others with their disciplined reigns.</p>
+                    <p>They balance power with wisdom in blocking choices.</p>
+                    <p>The league rewards those who rule their time wisely.</p>
+                </div>
+                <div class="quote">"Rule the retro waves, master the focus throne." - Digital Monarch</div>
+            </div>
+            <div class="league">
+                <h3>8. 8-Bit Emperor League</h3>
+                <div class="description">
+                    <p>Emperors expand their focus empires across all aspects of life. They integrate blocking with
+                        broader life hacks. This league embodies the pinnacle of 8-bit philosophy.</p>
+                    <p>Members orchestrate grand strategies for ultimate efficiency. It's where legends are made through
+                        unbreakable routines.</p>
+                    <p>Emperors share epic tales of focus conquests. The emphasis is on holistic mastery.</p>
+                </div>
+                <div class="quote">"In 8 bits, find infinite focus power." - Pixel Emperor</div>
+            </div>
+            <div class="league">
+                <h3>9. Legend Loader League</h3>
+                <div class="description">
+                    <p>Loaders summon legendary focus from the depths of determination. They load and execute perfect
+                        block protocols. This league revives myths from arcade lore.</p>
+                    <p>Members achieve god-mode productivity levels. Advancement is through transcending normal limits.
+                    </p>
+                    <p>It's the near-final step to enlightenment. Loaders often meditate on retro soundtracks.</p>
+                    <p>They load wisdom from past leagues to guide futures.</p>
+                </div>
+                <div class="quote">"Load the legend, live the focus dream." - Mythic Coder</div>
+            </div>
+            <div class="league">
+                <h3>10. Godmode Guardian League</h3>
+                <div class="description">
+                    <p>Guardians operate in godmode, invulnerable to distractions. They guard the gates of ultimate
+                        productivity. This top league is for the elite who have conquered all.</p>
+                    <p>Members maintain eternal vigilance over their focus realms. It's about legacy and inspiring the
+                        next generation.</p>
+                    <p>Guardians achieve flow states that defy time. They innovate beyond the tool's limits.</p>
+                    <p>The league represents the zenith of focus mastery. Only the most dedicated reach here.</p>
+                </div>
+                <div class="quote">"Enter godmode, guard your eternal focus." - Supreme Sentinel</div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Focus Mode Terminal.</p>
+    </footer>
+    <script>
+        // Simple localStorage-based "auth" and data storage
+        const leagues = [
+            "Byte Beginner League",
+            "Pixel Pioneer League",
+            "Code Crusader League",
+            "Data Defender League",
+            "Algorithm Adept League",
+            "Terminal Titan League",
+            "Retro Ruler League",
+            "8-Bit Emperor League",
+            "Legend Loader League",
+            "Godmode Guardian League"
+        ];
+        const thresholds = [0, 60, 180, 420, 900, 1860, 3780, 7620, 15300, 30660];
+        const IDLE_TIMEOUT = 300000; // 5 minutes in ms
+
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const blockForm = document.getElementById('block-form');
+        const blockedList = document.getElementById('blocked-list');
+        const loginSection = document.getElementById('login-section');
+        const focusSection = document.getElementById('focus-section');
+        const logoutBtn = document.getElementById('logout-btn');
+        const startFocusBtn = document.getElementById('start-focus');
+        let timerId = null;
+        let lastActivity = Date.now();
+
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                // Update tab buttons
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update form containers
+                document.querySelectorAll('.auth-form-container').forEach(c => c.classList.remove('active'));
+                document.getElementById(targetTab + '-tab').classList.add('active');
+
+                // Clear messages
+                document.getElementById('login-message').textContent = '';
+                document.getElementById('register-message').textContent = '';
+                document.getElementById('login-message').className = 'auth-message';
+                document.getElementById('register-message').className = 'auth-message';
+            });
+        });
+
+        // Register form
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            const msg = document.getElementById('register-message');
+
+            // Check if username already exists
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            if (users[username]) {
+                msg.textContent = 'Username already exists!';
+                msg.className = 'auth-message error';
+                return;
+            }
+
+            // Check password match
+            if (password !== confirm) {
+                msg.textContent = 'Passwords do not match!';
+                msg.className = 'auth-message error';
+                return;
+            }
+
+            // Check password length
+            if (password.length < 4) {
+                msg.textContent = 'Password must be at least 4 characters!';
+                msg.className = 'auth-message error';
+                return;
+            }
+
+            // Create account
+            users[username] = password;
+            localStorage.setItem('users', JSON.stringify(users));
+
+            msg.textContent = 'Account created! You can now login.';
+            msg.className = 'auth-message success';
+
+            // Switch to login tab after 1.5s
+            setTimeout(() => {
+                document.querySelector('.auth-tab[data-tab="login"]').click();
+                document.getElementById('login-username').value = username;
+            }, 1500);
+        });
+
+        // Login form
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const msg = document.getElementById('login-message');
+
+            // Check credentials
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            if (!users[username]) {
+                msg.textContent = 'Username not found!';
+                msg.className = 'auth-message error';
+                return;
+            }
+
+            if (users[username] !== password) {
+                msg.textContent = 'Incorrect password!';
+                msg.className = 'auth-message error';
+                return;
+            }
+
+            // Successful login
+            localStorage.setItem('loggedInUser', username);
+            localStorage.setItem('loggedIn', 'true');
+            showFocusSection();
+        });
+
+        // Detect user activity
+        ['mousemove', 'keydown', 'scroll', 'click'].forEach(event => {
+            document.addEventListener(event, () => {
+                lastActivity = Date.now();
+            });
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('loggedIn') === 'true') {
+            showFocusSection();
+        }
+
+        blockForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const site = document.getElementById('site').value;
+            addManagedSite(site);
+            document.getElementById('site').value = '';
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('loggedInUser');
+            loginSection.style.display = 'block';
+            focusSection.style.display = 'none';
+        });
+
+        startFocusBtn.addEventListener('click', () => {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                startFocusBtn.textContent = 'Start Focus Session';
+            } else {
+                timerId = setInterval(addPoints, 60000);
+                startFocusBtn.textContent = 'Stop Focus Session';
+            }
+        });
+
+        function showFocusSection() {
+            loginSection.style.display = 'none';
+            focusSection.style.display = 'block';
+            loadManagedSites();
+        }
+
+        function addManagedSite(site) {
+            const user = localStorage.getItem('loggedInUser');
+            let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+            managed.push({ site: site, enabled: true, points: 0 });
+            localStorage.setItem(`managedSites_${user}`, JSON.stringify(managed));
+            loadManagedSites();
+        }
+
+        function loadManagedSites() {
+            blockedList.innerHTML = '';
+            const user = localStorage.getItem('loggedInUser');
+            let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+            managed.forEach((item, index) => {
+                const li = document.createElement('li');
+
+                const label = document.createElement('label');
+                label.classList.add('toggle-label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = item.enabled;
+                checkbox.onchange = () => toggleEnabled(index, checkbox.checked);
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(' Block ' + item.site));
+
+                const statusSpan = document.createElement('span');
+                statusSpan.classList.add('status-span');
+                const league = getLeague(item.points || 0);
+                statusSpan.textContent = `League: ${league} (${item.points || 0} pts)`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = 'Remove';
+                removeBtn.classList.add('remove-btn');
+                removeBtn.onclick = () => removeSite(index);
+
+                li.appendChild(label);
+                li.appendChild(statusSpan);
+                li.appendChild(removeBtn);
+                blockedList.appendChild(li);
+            });
+        }
+
+        function toggleEnabled(index, enabled) {
+            const user = localStorage.getItem('loggedInUser');
+            let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+            managed[index].enabled = enabled;
+            localStorage.setItem(`managedSites_${user}`, JSON.stringify(managed));
+        }
+
+        function removeSite(index) {
+            const user = localStorage.getItem('loggedInUser');
+            let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+            managed.splice(index, 1);
+            localStorage.setItem(`managedSites_${user}`, JSON.stringify(managed));
+            loadManagedSites();
+        }
+
+        function addPoints() {
+            // Only add points if page is visible and user was active in last 5 min
+            if (document.visibilityState === 'visible' && (Date.now() - lastActivity) < IDLE_TIMEOUT) {
+                const user = localStorage.getItem('loggedInUser');
+                let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+                managed.forEach(item => {
+                    if (item.enabled) {
+                        item.points = (item.points || 0) + 1;
+                    }
+                });
+                localStorage.setItem(`managedSites_${user}`, JSON.stringify(managed));
+                loadManagedSites();
+                loadLeaderboard();
+            }
+        }
+
+        function getLeague(points) {
+            for (let i = thresholds.length - 1; i >= 0; i--) {
+                if (points >= thresholds[i]) {
+                    return leagues[i];
+                }
+            }
+            return leagues[0];
+        }
+
+        function loadLeaderboard() {
+            const user = localStorage.getItem('loggedInUser');
+            let managed = JSON.parse(localStorage.getItem(`managedSites_${user}`)) || [];
+            let totalPoints = managed.reduce((sum, item) => sum + (item.points || 0), 0);
+            let overallLeague = getLeague(totalPoints);
+
+            document.getElementById('overall-league-lb').textContent = overallLeague;
+            document.getElementById('overall-points-lb').textContent = totalPoints;
+
+            // Sort sites by points descending
+            let sorted = [...managed].sort((a, b) => (b.points || 0) - (a.points || 0));
+            const siteLeaderboard = document.getElementById('site-leaderboard');
+            siteLeaderboard.innerHTML = '';
+            sorted.forEach(item => {
+                const li = document.createElement('li');
+                const league = getLeague(item.points || 0);
+                li.textContent = `${item.site}: ${league} (${item.points || 0} pts)`;
+                siteLeaderboard.appendChild(li);
+            });
+        }
+
+        // Handle hash navigation
+        function handleHashChange() {
+            const hash = window.location.hash.substring(1) || 'home';
+            document.querySelectorAll('main section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+
+            const activeSection = document.getElementById(hash);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                activeSection.style.display = 'block';
+            }
+
+            if (hash === 'leaderboard') {
+                loadLeaderboard();
+            }
+        }
+
+        window.addEventListener('hashchange', handleHashChange);
+        handleHashChange();
+    </script>
+</body>
+
+</html>
